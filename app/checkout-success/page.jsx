@@ -12,28 +12,56 @@ function CheckoutSuccessContent() {
     const sessionId = searchParams.get('session_id');
 
     useEffect(() => {
-        if (vin && sessionId) {
-            // Store payment status in localStorage
-            const paymentKey = `payment_${vin}`;
-            localStorage.setItem(paymentKey, JSON.stringify({
-                paid: true,
-                sessionId: sessionId,
-                timestamp: Date.now()
-            }));
-            
-            // Ensure report is in sessionStorage (in case it was cleared)
-            const reportKey = `report_${vin}`;
-            const existingReport = sessionStorage.getItem(reportKey);
-            
-            // Redirect to final report
-            setTimeout(() => {
-                // Use replace to avoid back button issues
-                window.location.href = `/?vin=${encodeURIComponent(vin)}&paid=true`;
-            }, 1500);
-        } else {
-            setError('Missing payment information');
-            setLoading(false);
-        }
+        const verifyPayment = async () => {
+            if (vin && sessionId) {
+                try {
+                    // Verify payment server-side with Stripe
+                    const response = await fetch('/api/verify-payment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ vin, sessionId }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.verified) {
+                        setError(data.error || 'Payment verification failed');
+                        setLoading(false);
+                        return;
+                    }
+
+                    // Only store payment status after server-side verification
+                    const paymentKey = `payment_${vin}`;
+                    localStorage.setItem(paymentKey, JSON.stringify({
+                        paid: true,
+                        sessionId: sessionId,
+                        timestamp: Date.now(),
+                        verified: true
+                    }));
+                    
+                    // Ensure report is in sessionStorage (in case it was cleared)
+                    const reportKey = `report_${vin}`;
+                    const existingReport = sessionStorage.getItem(reportKey);
+                    
+                    // Redirect to final report
+                    setTimeout(() => {
+                        // Use replace to avoid back button issues
+                        window.location.href = `/?vin=${encodeURIComponent(vin)}&paid=true`;
+                    }, 1500);
+                } catch (err) {
+                    console.error('Payment verification error:', err);
+                    setError('Failed to verify payment. Please contact support.');
+                    setLoading(false);
+                }
+            } else {
+                setError('Missing payment information');
+                setLoading(false);
+            }
+        };
+
+        verifyPayment();
     }, [vin, sessionId]);
 
     if (error) {

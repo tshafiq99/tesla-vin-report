@@ -1,0 +1,62 @@
+# LLMs.txt for Tesla VIN Report
+
+## About
+Tesla VIN Report is a comprehensive VIN analysis application specifically designed for Tesla vehicles. It provides detailed insights into vehicle configuration, battery health, performance specifications, safety features, warranty information, service history, market information, production details, charging compatibility, software updates, internet research insights, and more.
+
+## Purpose
+This application allows users to enter a Tesla VIN (Vehicle Identification Number) and receive a comprehensive report analyzing various aspects of the vehicle based on VIN decoding standards and multiple data sources.
+
+## Key Features
+- Tesla-specific VIN validation and decoding
+- Comprehensive vehicle configuration analysis
+- Battery insights and health information
+- Performance specifications
+- Safety features and ratings
+- Warranty and service information
+- Market valuation estimates
+- Production details and manufacturing information
+- Charging compatibility information
+- Software update history
+- Internet research insights on the specific vehicle
+- Battery health and degradation analysis
+
+## VIN Format
+Tesla VINs are 17 characters long and follow standard VIN encoding:
+- Cannot contain I, O, or Q
+- Must start with valid Tesla manufacturer codes (5YJ, 7SA, etc.)
+- Contains encoded information about model, year, manufacturing plant, and vehicle options
+
+## Report Structure
+Reports are generated in two stages:
+1. Sample Report: Shows preview of available information
+2. Final Report: Full detailed report (requires payment)
+
+## API Endpoints
+- POST /api/analyze-vin: Analyzes a Tesla VIN and generates comprehensive report
+- POST /api/create-checkout-session: Creates Stripe checkout session for payment
+- POST /api/verify-payment: Verifies Stripe payment status
+
+## Technology Stack
+- Next.js (React framework)
+- Grok AI (grok-4-1-fast-reasoning model) for VIN analysis
+- Stripe for payment processing
+- Client-side validation and state management
+
+## Data Sources
+The application analyzes VINs using:
+- VIN decoding standards
+- Tesla-specific vehicle databases
+- Multiple online sources for vehicle information
+- Internet research for vehicle-specific insights
+
+## Usage
+1. Enter a valid 17-character Tesla VIN
+2. Submit to generate report (can take up to 3 minutes)
+3. Review Sample Report
+4. Complete payment to access Full Final Report
+
+## Contact
+For feature requests: https://forms.gle/Mi6MqMfDqWFvbz4AA
+
+## Last Updated
+2026-02-09

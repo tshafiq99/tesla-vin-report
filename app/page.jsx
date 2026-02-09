@@ -464,14 +464,39 @@ function PageContent() {
     const [apiError, setApiError] = useState('');
     const [showFinalReport, setShowFinalReport] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
+    const [paymentVerified, setPaymentVerified] = useState(null);
 
-    const checkPaymentStatus = (vinToCheck) => {
+    const checkPaymentStatus = async (vinToCheck) => {
         if (!vinToCheck) return false;
         const paymentKey = `payment_${vinToCheck}`;
         const paymentData = localStorage.getItem(paymentKey);
         if (paymentData) {
             try {
                 const parsed = JSON.parse(paymentData);
+                // If we have a sessionId, verify it server-side
+                if (parsed.sessionId && parsed.paid === true) {
+                    try {
+                        const response = await fetch('/api/verify-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ vin: vinToCheck, sessionId: parsed.sessionId }),
+                        });
+                        const data = await response.json();
+                        if (data.verified) {
+                            return true;
+                        } else {
+                            // Payment verification failed, clear invalid data
+                            localStorage.removeItem(paymentKey);
+                            return false;
+                        }
+                    } catch (e) {
+                        console.error('Payment verification error:', e);
+                        // On error, fall back to localStorage check but log warning
+                        return parsed.paid === true;
+                    }
+                }
                 return parsed.paid === true;
             } catch (e) {
                 return false;
@@ -481,34 +506,41 @@ function PageContent() {
     };
 
     useEffect(() => {
-        const vinParam = searchParams.get('vin');
-        const paid = searchParams.get('paid');
-        
-        if (vinParam) {
-            // Check payment status
-            const hasPaid = checkPaymentStatus(vinParam);
+        const loadReportAfterPayment = async () => {
+            const vinParam = searchParams.get('vin');
+            const paid = searchParams.get('paid');
             
-            if (hasPaid) {
-                // Check if report exists in sessionStorage
-                const storedReport = sessionStorage.getItem(`report_${vinParam}`);
-                if (storedReport) {
-                    try {
-                        const parsedReport = JSON.parse(storedReport);
-                        setReport(parsedReport);
-                        setShowFinalReport(true);
-                        return;
-                    } catch (e) {
-                        console.error('Failed to parse stored report:', e);
-                    }
-                }
+            if (vinParam) {
+                // Check payment status (async verification)
+                const hasPaid = await checkPaymentStatus(vinParam);
                 
-                // If report is already loaded and matches VIN, show final report
-                if (report && vinParam === report.vin) {
-                    setShowFinalReport(true);
+                if (hasPaid) {
+                    // Check if report exists in sessionStorage
+                    const storedReport = sessionStorage.getItem(`report_${vinParam}`);
+                    if (storedReport) {
+                        try {
+                            const parsedReport = JSON.parse(storedReport);
+                            setReport(parsedReport);
+                            setShowFinalReport(true);
+                            return;
+                        } catch (e) {
+                            console.error('Failed to parse stored report:', e);
+                        }
+                    }
+                    
+                    // If report is already loaded and matches VIN, show final report
+                    if (report && vinParam === report.vin) {
+                        setShowFinalReport(true);
+                    }
+                } else if (paid === 'true') {
+                    // If paid param is true but verification failed, reset to sample report
+                    setShowFinalReport(false);
                 }
             }
-        }
-    }, [searchParams, report]);
+        };
+        
+        loadReportAfterPayment();
+    }, [searchParams]);
 
     const handleShowFinalReport = async () => {
         if (!report || !report.vin) {
@@ -520,7 +552,7 @@ function PageContent() {
                     try {
                         const parsedReport = JSON.parse(storedReport);
                         setReport(parsedReport);
-                        const hasPaid = checkPaymentStatus(vinParam);
+                        const hasPaid = await checkPaymentStatus(vinParam);
                         if (hasPaid) {
                             setShowFinalReport(true);
                             return;
@@ -533,8 +565,8 @@ function PageContent() {
             return;
         }
 
-        // Check if payment has been completed
-        const hasPaid = checkPaymentStatus(report.vin);
+        // Check if payment has been completed (with server-side verification)
+        const hasPaid = await checkPaymentStatus(report.vin);
         
         if (hasPaid) {
             setShowFinalReport(true);
@@ -868,11 +900,51 @@ function PageContent() {
         );
     }
 
+    useEffect(() => {
+        const verifyPaymentForFinalReport = async () => {
+            if (report && showFinalReport && report.vin) {
+                const hasPaid = await checkPaymentStatus(report.vin);
+                setPaymentVerified(hasPaid);
+                if (!hasPaid) {
+                    setShowFinalReport(false);
+                }
+            } else if (!showFinalReport) {
+                // Reset verification state when not showing final report
+                setPaymentVerified(null);
+            }
+        };
+        
+        if (report && showFinalReport) {
+            verifyPaymentForFinalReport();
+        } else {
+            setPaymentVerified(null);
+        }
+    }, [report, showFinalReport]);
+
     if (report && showFinalReport) {
-        // Verify payment before showing final report
-        const hasPaid = checkPaymentStatus(report.vin);
-        if (!hasPaid) {
-            // Payment not verified, redirect back to sample report
+        // Show loading while verifying payment
+        if (paymentVerified === null) {
+            return (
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '100vh',
+                    flexDirection: 'column',
+                    gap: '20px'
+                }}>
+                    <svg width="40" height="40" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'spin 1s linear infinite' }}>
+                        <circle cx="10" cy="10" r="7" stroke="#E31937" strokeWidth="2" strokeDasharray="22" strokeDashoffset="11" strokeLinecap="round" opacity="0.5"/>
+                    </svg>
+                    <p style={{ color: '#6b7280', fontSize: '16px' }}>
+                        Verifying payment...
+                    </p>
+                </div>
+            );
+        }
+        
+        // Payment not verified, redirect back to sample report
+        if (paymentVerified === false) {
             return (
                 <div style={{
                     display: 'flex',
@@ -886,7 +958,10 @@ function PageContent() {
                         Payment verification required to view Final Report
                     </p>
                     <button
-                        onClick={() => setShowFinalReport(false)}
+                        onClick={() => {
+                            setShowFinalReport(false);
+                            setPaymentVerified(null);
+                        }}
                         style={{
                             padding: '10px 20px',
                             backgroundColor: '#E31937',
@@ -1424,7 +1499,101 @@ function PageContent() {
                         {apiError}
                     </p>
                 )}
+                <p style={{ 
+                    fontSize: '12px', 
+                    color: 'rgba(255, 255, 255, 0.7)', 
+                    margin: 0, 
+                    textAlign: 'center',
+                    fontStyle: 'italic',
+                    maxWidth: '400px',
+                    lineHeight: '1.4'
+                }}>
+                    Reports can take up to 3 minutes as we analyze multiple sources
+                </p>
             </form>
+            <div style={{
+                position: 'absolute',
+                bottom: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 1,
+                display: 'flex',
+                gap: '16px',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                justifyContent: 'center'
+            }}>
+                <span style={{
+                    fontSize: '12px',
+                    color: 'rgba(255, 255, 255, 0.6)'
+                }}>
+                    © 2026 TeslaVINReport
+                </span>
+                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
+                <a 
+                    href="/Blog.txt"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                        fontSize: '12px',
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        textDecoration: 'none',
+                        transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'}
+                    onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}
+                >
+                    Blog
+                </a>
+                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
+                <a 
+                    href="/PrivacyPolicy.txt"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                        fontSize: '12px',
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        textDecoration: 'none',
+                        transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'}
+                    onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}
+                >
+                    Privacy
+                </a>
+                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
+                <a 
+                    href="/llms.txt"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                        fontSize: '12px',
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        textDecoration: 'none',
+                        transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'}
+                    onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}
+                >
+                    For LLMs
+                </a>
+                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
+                <a 
+                    href="https://forms.gle/Mi6MqMfDqWFvbz4AA"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                        fontSize: '12px',
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        textDecoration: 'none',
+                        transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'}
+                    onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}
+                >
+                    Feature Request
+                </a>
+            </div>
             <div style={{
                 position: 'absolute',
                 bottom: '20px',

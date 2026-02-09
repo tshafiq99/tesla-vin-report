@@ -1,0 +1,127 @@
+# Privacy Policy for Tesla VIN Report
+
+**Last Updated: February 9, 2026**
+
+## Introduction
+
+Tesla VIN Report ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Tesla VIN Report application (the "Service").
+
+## Information We Collect
+
+### VIN Information
+- **Vehicle Identification Numbers (VINs)**: When you use our Service, you provide us with your Tesla VIN for analysis
+- **VINs are processed**: We use your VIN to generate comprehensive vehicle reports through our analysis service
+- **Temporary Storage**: VINs may be temporarily stored in your browser's sessionStorage to maintain your report during your session
+
+### Payment Information
+- **Payment Processing**: We use Stripe, a third-party payment processor, to handle all payment transactions
+- **We do not store**: We do not store, process, or have access to your full payment card details
+- **Stripe Privacy**: Payment information is handled according to Stripe's privacy policy and security standards
+
+### Technical Information
+- **Browser Data**: We may collect technical information such as browser type, device information, and IP addresses for service functionality
+- **Usage Data**: We may collect information about how you interact with our Service
+
+## How We Use Your Information
+
+### VIN Analysis
+- **Report Generation**: Your VIN is used to generate comprehensive vehicle reports through our analysis service
+- **Third-Party Processing**: VINs are processed using Grok AI services to provide detailed vehicle insights
+- **No Permanent Storage**: VINs are not permanently stored on our servers after report generation
+
+### Payment Processing
+- **Transaction Processing**: Payment information is processed securely through Stripe
+- **Payment Verification**: We verify payment status to provide access to full reports
+
+### Service Improvement
+- **Analytics**: We may use aggregated, anonymized data to improve our Service
+- **Error Tracking**: Technical information may be used to diagnose and fix issues
+
+## Third-Party Services
+
+### Grok AI
+- **VIN Analysis**: We use Grok AI (grok-4-1-fast-reasoning model) to analyze VINs and generate reports
+- **Data Sharing**: Your VIN is shared with Grok AI for processing purposes
+- **Grok AI Privacy**: Grok AI's use of your information is subject to their privacy policy
+
+### Stripe
+- **Payment Processing**: We use Stripe to process payments securely
+- **Payment Data**: Payment information is handled by Stripe according to their privacy policy
+- **No Card Storage**: We do not have access to or store your payment card details
+
+## Data Storage and Security
+
+### Client-Side Storage
+- **SessionStorage**: Reports are temporarily stored in your browser's sessionStorage during your session
+- **LocalStorage**: Payment verification status is stored in localStorage for your convenience
+- **Automatic Clearing**: Session data is cleared when you close your browser or generate a new report
+
+### Server-Side Storage
+- **Minimal Storage**: We do not permanently store VINs or personal information on our servers
+- **Payment Records**: Stripe maintains payment transaction records according to their policies
+
+### Security Measures
+- **Encryption**: We use industry-standard encryption for data transmission
+- **Secure Connections**: All data transmission occurs over HTTPS
+- **Access Controls**: We implement appropriate technical and organizational measures to protect your information
+
+## Your Rights and Choices
+
+### Access and Control
+- **Report Access**: You can access your generated reports during your session
+- **Data Deletion**: You can clear your browser's storage to remove locally stored data
+- **New Report**: You can generate a new report at any time, which clears previous session data
+
+### Payment Information
+- **Payment History**: Payment history is maintained by Stripe and subject to their policies
+- **Refunds**: Refund requests should be directed to our support team
+
+## Cookies and Tracking
+
+### Browser Storage
+- **SessionStorage**: Used to maintain your report during your session
+- **LocalStorage**: Used to store payment verification status
+- **No Tracking Cookies**: We do not use tracking cookies or third-party analytics cookies
+
+## Children's Privacy
+
+Our Service is not intended for individuals under the age of 18. We do not knowingly collect personal information from children.
+
+## Data Retention
+
+- **VINs**: Not permanently stored; processed and discarded after report generation
+- **Session Data**: Cleared when you close your browser or generate a new report
+- **Payment Records**: Maintained by Stripe according to their retention policies
+
+## International Data Transfers
+
+Your information may be processed and stored in countries other than your country of residence. By using our Service, you consent to the transfer of your information to these countries.
+
+## Changes to This Privacy Policy
+
+We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.
+
+## Contact Us
+
+If you have questions about this Privacy Policy or our data practices, please contact us through our Feature Request form: https://forms.gle/Mi6MqMfDqWFvbz4AA
+
+## Compliance
+
+This Privacy Policy is designed to comply with:
+- General Data Protection Regulation (GDPR)
+- California Consumer Privacy Act (CCPA)
+- Other applicable privacy laws
+
+## Disclaimer
+
+While we take reasonable measures to protect your information, no method of transmission over the Internet or electronic storage is 100% secure. We cannot guarantee absolute security of your information.
+
+## Your Consent
+
+By using our Service, you consent to this Privacy Policy and agree to its terms.
+
+---
+
+**Tesla VIN Report**
+© 2026 TeslaVINReport
+All rights reserved
