@@ -259,6 +259,88 @@ const Icons = {
     )
 };
 
+function TableOfContents({ report }) {
+    const sections = [];
+    
+    if (report.vinBreakdown) sections.push({ title: 'VIN Breakdown', icon: Icons.vin });
+    if (report.validation) sections.push({ title: 'Validation', icon: Icons.validation });
+    if (report.vehicleConfiguration) sections.push({ title: 'Vehicle Configuration', icon: Icons.vehicle });
+    if (report.performanceSpecifications) sections.push({ title: 'Performance Specifications', icon: Icons.performance });
+    if (report.batteryInsights) sections.push({ title: 'Battery Insights', icon: Icons.battery });
+    if (report.batteryHealth) sections.push({ title: 'Battery Health', icon: Icons.batteryHealth });
+    if (report.connectivityInsights) sections.push({ title: 'Connectivity Insights', icon: Icons.connectivity });
+    if (report.safetyFeatures) sections.push({ title: 'Safety Features', icon: Icons.safety });
+    if (report.featurePackages) sections.push({ title: 'Feature Packages', icon: Icons.package });
+    if (report.warrantyInformation) sections.push({ title: 'Warranty Information', icon: Icons.warranty });
+    if (report.serviceAndMaintenance) sections.push({ title: 'Service & Maintenance', icon: Icons.service });
+    if (report.marketInformation) sections.push({ title: 'Market Information', icon: Icons.market });
+    if (report.productionDetails) sections.push({ title: 'Production Details', icon: Icons.production });
+    if (report.chargingCompatibility) sections.push({ title: 'Charging Compatibility', icon: Icons.charging });
+    if (report.softwareAndUpdates) sections.push({ title: 'Software & Updates', icon: Icons.software });
+    if (report.internetInsights) sections.push({ title: 'Internet Insights', icon: Icons.internet });
+    if (report.analysis?.keyFindings) sections.push({ title: 'Key Findings', icon: null });
+    if (report.analysis?.recommendations) sections.push({ title: 'Recommendations', icon: null });
+    if (report.analysis?.insights) sections.push({ title: 'Additional Insights', icon: null });
+    if (report.analysis?.notableFeatures) sections.push({ title: 'Notable Features', icon: null });
+    if (report.analysis?.considerations) sections.push({ title: 'Important Considerations', icon: null });
+
+    if (sections.length === 0) return null;
+
+    return (
+        <div style={{
+            backgroundColor: '#f9fafb',
+            borderRadius: '12px',
+            padding: '20px',
+            border: '1px solid #e5e7eb'
+        }}>
+            <h2 style={{
+                fontSize: '20px',
+                fontWeight: 600,
+                margin: '0 0 16px 0',
+                color: '#111827',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+            }}>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 4H17M3 8H17M3 12H17M3 16H10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                Table of Contents
+            </h2>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                gap: '12px'
+            }}>
+                {sections.map((section, index) => (
+                    <div key={index} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '8px 12px',
+                        backgroundColor: '#ffffff',
+                        borderRadius: '6px',
+                        border: '1px solid #e5e7eb'
+                    }}>
+                        {section.icon && (
+                            <span style={{ color: '#E31937', display: 'flex', alignItems: 'center' }}>
+                                {section.icon}
+                            </span>
+                        )}
+                        <span style={{
+                            fontSize: '14px',
+                            color: '#374151',
+                            fontWeight: 500
+                        }}>
+                            {section.title}
+                        </span>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function ReportSection({ title, data, icon }) {
     if (!data || Object.keys(data).length === 0) return null;
 
@@ -490,6 +572,8 @@ export default function Page() {
                             Go to Final Report
                         </button>
                     </div>
+
+                    <TableOfContents report={report} />
 
                     {report.analysis?.summary && (
                         <div style={{
@@ -742,6 +826,8 @@ export default function Page() {
                             </button>
                         </div>
                     </div>
+
+                    <TableOfContents report={report} />
 
                     {report.analysis?.summary && (
                         <div style={{
