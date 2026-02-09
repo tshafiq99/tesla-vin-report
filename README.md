@@ -1,43 +1,147 @@
-# Next.js on Netlify Platform Starter
+# Tesla VIN Report
 
-[Live Demo](https://nextjs-platform-starter.netlify.app/)
+A specialized VIN check tool designed exclusively for Tesla vehicles. This comprehensive application decodes and analyzes Tesla Vehicle Identification Numbers (VINs) to provide detailed insights about your Tesla's specifications, battery configuration, connectivity features, and more.
 
-A modern starter based on Next.js 16 (App Router), Tailwind, and [Netlify Core Primitives](https://docs.netlify.com/core/overview/#develop) (Edge Functions, Image CDN, Blob Store).
+## What is a VIN Check?
 
-In this site, Netlify Core Primitives are used both implictly for running Next.js features (e.g. Route Handlers, image optimization via `next/image`, and more) and also explicitly by the user code.
+A VIN (Vehicle Identification Number) is a unique 17-character code that serves as a vehicle's fingerprint. Each Tesla VIN contains encoded information about the vehicle's manufacturing details, specifications, and features. This tool decodes Tesla-specific VIN patterns to reveal comprehensive vehicle information.
 
-Implicit usage means you're using any Next.js functionality and everything "just works" when deployed - all the plumbing is done for you. Explicit usage is framework-agnostic and typically provides more features than what Next.js exposes.
+## Why Tesla-Specific?
 
-## Deploying to Netlify
+Tesla VINs follow unique patterns and encoding schemes that differ from traditional automotive manufacturers. This tool is specifically designed to:
 
-Click the button below to deploy this template to your Netlify account.
+- **Recognize Tesla VIN prefixes**: Validates against known Tesla manufacturing codes (5YJ, 7SA, 5YJ3, 5YJY, LRW, 7SL)
+- **Decode Tesla-specific data**: Interprets Tesla's unique VIN encoding for battery packs, motor configurations, and feature sets
+- **Provide Tesla insights**: Generates reports tailored to Tesla's technology and specifications
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/netlify-templates/next-platform-starter)
+## Features
 
-## Developing Locally
+### VIN Validation
+- **Format Validation**: Ensures the VIN follows the correct 17-character format
+- **Character Validation**: Filters out invalid characters (I, O, Q are not used in VINs)
+- **Tesla Authentication**: Verifies the VIN belongs to a Tesla vehicle by checking manufacturer codes
+- **Real-time Feedback**: Visual indicators show validation status as you type
 
-1. Clone this repository, then run `npm install` in its root directory.
+### Battery Insights
+- **Battery Pack Type**: Identifies the specific battery pack configuration
+- **Battery Capacity**: Decodes battery capacity from VIN encoding
+- **Battery Chemistry**: Determines battery chemistry type (LFP, NCA, etc.)
+- **Charging Specifications**: Provides charging capability information
+- **Battery Health Indicators**: Historical and manufacturing data related to battery
 
-2. For the starter to have full functionality locally (e.g. edge functions, blob store), please ensure you have an up-to-date version of Netlify CLI. Run:
+### Internet & Connectivity Insights
+- **Connectivity Features**: Identifies internet connectivity capabilities
+- **Autopilot Hardware**: Determines Autopilot hardware version
+- **Software Capabilities**: Infers software update eligibility and features
+- **Premium Connectivity**: Identifies premium connectivity package status
 
+### Vehicle Configuration
+- **Model Identification**: Determines exact Tesla model (Model S, 3, X, Y)
+- **Manufacturing Location**: Identifies factory location (Fremont, Shanghai, etc.)
+- **Production Year**: Extracts manufacturing year
+- **Drive Configuration**: Identifies motor configuration (RWD, AWD, Performance)
+- **Paint & Interior**: Decodes paint color and interior options
+- **Feature Packages**: Identifies included feature packages and options
+
+### Comprehensive Report
+- **Detailed Breakdown**: Complete analysis of all decoded VIN information
+- **Visual Presentation**: Easy-to-read format with organized sections
+- **Export Options**: Save or share your VIN report
+
+## How It Works
+
+1. **Enter Your VIN**: Input your 17-character Tesla VIN in the provided field
+2. **Validation**: The tool validates the format and verifies it's a Tesla VIN
+3. **Decoding**: Tesla-specific algorithms decode the VIN structure
+4. **Analysis**: Comprehensive analysis extracts all available information
+5. **Report Generation**: A detailed report is generated with all insights
+
+## Tesla VIN Structure
+
+Tesla VINs contain encoded information in specific positions:
+
+- **Positions 1-3**: World Manufacturer Identifier (WMI) - Tesla codes
+- **Position 4**: Vehicle type/model line
+- **Position 5**: Restraint system and body type
+- **Position 6**: Motor/Drive unit type
+- **Position 7**: Battery pack type
+- **Position 8**: Motor configuration
+- **Position 9**: Check digit
+- **Position 10**: Model year
+- **Position 11**: Manufacturing plant
+- **Positions 12-17**: Sequential production number
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm or yarn package manager
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd tesla-vin-report
 ```
-npm install netlify-cli@latest -g
+
+2. Install dependencies:
+```bash
+npm install
 ```
 
-3. Link your local repository to the deployed Netlify site. This will ensure you're using the same runtime version for both local development and your deployed site.
-
-```
-netlify link
-```
-
-4. Then, run the Next.js development server via Netlify CLI:
-
-```
-netlify dev
+3. Run the development server:
+```bash
+npm run dev
 ```
 
-If your browser doesn't navigate to the site automatically, visit [localhost:8888](http://localhost:8888).
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Resources
+5. Enter your Tesla VIN to generate a comprehensive report.
 
-- Check out the [Next.js on Netlify docs](https://docs.netlify.com/frameworks/next-js/overview/)
+### Production Build
+
+```bash
+npm run build
+npm start
+```
+
+## Technology Stack
+
+- **Next.js 16**: React framework for production
+- **React 19**: UI library
+- **Modern Web Standards**: Built with latest web technologies
+
+## Supported Tesla Models
+
+- Model S
+- Model 3
+- Model X
+- Model Y
+- Cybertruck (when available)
+
+## Supported Manufacturing Locations
+
+- Fremont, California (USA)
+- Shanghai, China
+- Berlin, Germany
+- Austin, Texas (USA)
+
+## Privacy & Security
+
+- **No Data Storage**: VINs are processed client-side and not stored
+- **Secure Processing**: All validation and decoding happens securely
+- **Privacy First**: Your vehicle information remains private
+
+## Contributing
+
+This is a private project. For issues or suggestions, please contact the maintainers.
+
+## License
+
+Private project - All rights reserved
+
+## Disclaimer
+
+This tool provides information decoded from VIN data. While accurate to the best of our knowledge, some information may vary based on manufacturing changes and updates. Always verify critical information through official Tesla channels.
