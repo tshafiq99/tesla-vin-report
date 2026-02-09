@@ -121,8 +121,29 @@ export default function RootLayout({ children }) {
                     }
                 `}</style>
             </head>
-            <body style={{ fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
-                {children}
+            <body style={{ 
+                fontFamily: "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                backgroundImage: 'url(https://cdn.prod.website-files.com/6722c0d680a58bcfbb96bb32/6737943950da85e3979e6bc3_3196455d-1ffc-429f-81cf-072194c7912c%201.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed',
+                minHeight: '100vh',
+                position: 'relative'
+            }}>
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                    zIndex: 0,
+                    pointerEvents: 'none'
+                }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    {children}
+                </div>
             </body>
         </html>
     );

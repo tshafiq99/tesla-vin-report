@@ -21,15 +21,20 @@ function CheckoutSuccessContent() {
                 timestamp: Date.now()
             }));
             
+            // Ensure report is in sessionStorage (in case it was cleared)
+            const reportKey = `report_${vin}`;
+            const existingReport = sessionStorage.getItem(reportKey);
+            
             // Redirect to final report
             setTimeout(() => {
-                router.push(`/?vin=${encodeURIComponent(vin)}&paid=true`);
-            }, 2000);
+                // Use replace to avoid back button issues
+                window.location.href = `/?vin=${encodeURIComponent(vin)}&paid=true`;
+            }, 1500);
         } else {
             setError('Missing payment information');
             setLoading(false);
         }
-    }, [vin, sessionId, router]);
+    }, [vin, sessionId]);
 
     if (error) {
         return (

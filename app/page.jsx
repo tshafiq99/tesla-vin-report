@@ -60,19 +60,20 @@ function VinBreakdown({ vin, data }) {
         <div style={{
             backgroundColor: '#f9fafb',
             borderRadius: '12px',
-            padding: '20px',
+            padding: 'clamp(16px, 3vw, 20px)',
             border: '1px solid #e5e7eb'
         }}>
             <h3 style={{
-                fontSize: '18px',
+                fontSize: 'clamp(16px, 3vw, 18px)',
                 fontWeight: 600,
-                margin: '0 0 20px 0',
+                margin: '0 0 clamp(16px, 3vw, 20px) 0',
                 color: '#111827',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                flexWrap: 'wrap'
             }}>
-                                <span style={{ color: '#E31937', display: 'flex', alignItems: 'center' }}>{Icons.vin}</span>
+                                <span style={{ color: '#E31937', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{Icons.vin}</span>
                 VIN Breakdown
             </h3>
             
@@ -80,25 +81,28 @@ function VinBreakdown({ vin, data }) {
                 <div style={{
                     backgroundColor: '#ffffff',
                     borderRadius: '8px',
-                    padding: '16px',
-                    marginBottom: '20px',
+                    padding: 'clamp(12px, 2vw, 16px)',
+                    marginBottom: 'clamp(16px, 3vw, 20px)',
                     border: '1px solid #e5e7eb',
                     fontFamily: 'monospace',
-                    fontSize: '20px',
-                    letterSpacing: '4px',
+                    fontSize: 'clamp(14px, 3vw, 20px)',
+                    letterSpacing: 'clamp(2px, 0.5vw, 4px)',
                     textAlign: 'center',
                     fontWeight: 600,
-                    color: '#111827'
+                    color: '#111827',
+                    overflowX: 'auto'
                 }}>
-                    {vin.split('').map((char, index) => (
-                        <span key={index} style={{
-                            display: 'inline-block',
-                            width: '24px',
-                            textAlign: 'center',
-                            borderBottom: '2px solid #E31937',
-                            paddingBottom: '4px'
-                        }}>{char}</span>
-                    ))}
+                    <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '2px' }}>
+                        {vin.split('').map((char, index) => (
+                            <span key={index} style={{
+                                display: 'inline-block',
+                                minWidth: 'clamp(18px, 3vw, 24px)',
+                                textAlign: 'center',
+                                borderBottom: '2px solid #E31937',
+                                paddingBottom: '4px'
+                            }}>{char}</span>
+                        ))}
+                    </div>
                 </div>
             )}
 
@@ -112,30 +116,33 @@ function VinBreakdown({ vin, data }) {
                         <div key={key} style={{
                             backgroundColor: '#ffffff',
                             borderRadius: '8px',
-                            padding: '16px',
+                            padding: 'clamp(12px, 2vw, 16px)',
                             border: '1px solid #e5e7eb'
                         }}>
                             <div style={{
                                 display: 'flex',
+                                flexWrap: 'wrap',
                                 alignItems: 'center',
-                                gap: '12px',
+                                gap: 'clamp(8px, 2vw, 12px)',
                                 marginBottom: '8px'
                             }}>
                                 <span style={{
                                     backgroundColor: '#E31937',
                                     color: 'white',
-                                    padding: '4px 12px',
+                                    padding: 'clamp(3px, 1vw, 4px) clamp(10px, 2vw, 12px)',
                                     borderRadius: '6px',
-                                    fontSize: '14px',
+                                    fontSize: 'clamp(12px, 2.5vw, 14px)',
                                     fontWeight: 600,
-                                    fontFamily: 'monospace'
+                                    fontFamily: 'monospace',
+                                    flexShrink: 0
                                 }}>
                                     {vinChars || 'N/A'}
                                 </span>
                                 <span style={{
                                     color: '#111827',
                                     fontWeight: 600,
-                                    fontSize: '16px'
+                                    fontSize: 'clamp(14px, 3vw, 16px)',
+                                    wordBreak: 'break-word'
                                 }}>
                                     {label}
                                 </span>
@@ -144,7 +151,8 @@ function VinBreakdown({ vin, data }) {
                                 color: '#374151',
                                 margin: 0,
                                 lineHeight: '1.6',
-                                fontSize: '14px'
+                                fontSize: 'clamp(13px, 2.5vw, 14px)',
+                                wordBreak: 'break-word'
                             }}>
                                 {String(value)}
                             </p>
@@ -291,17 +299,18 @@ function TableOfContents({ report }) {
         <div style={{
             backgroundColor: '#f9fafb',
             borderRadius: '12px',
-            padding: '20px',
+            padding: 'clamp(16px, 3vw, 20px)',
             border: '1px solid #e5e7eb'
         }}>
             <h2 style={{
-                fontSize: '20px',
+                fontSize: 'clamp(18px, 4vw, 20px)',
                 fontWeight: 600,
-                margin: '0 0 16px 0',
+                margin: '0 0 clamp(12px, 2vw, 16px) 0',
                 color: '#111827',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                flexWrap: 'wrap'
             }}>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3 4H17M3 8H17M3 12H17M3 16H10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -310,7 +319,7 @@ function TableOfContents({ report }) {
             </h2>
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 250px), 1fr))',
                 gap: '12px'
             }}>
                 {sections.map((section, index) => (
@@ -349,19 +358,20 @@ function ReportSection({ title, data, icon }) {
         <div style={{
             backgroundColor: '#f9fafb',
             borderRadius: '12px',
-            padding: '20px',
+            padding: 'clamp(16px, 3vw, 20px)',
             border: '1px solid #e5e7eb'
         }}>
             <h3 style={{
-                fontSize: '18px',
+                fontSize: 'clamp(16px, 3vw, 18px)',
                 fontWeight: 600,
-                margin: '0 0 16px 0',
+                margin: '0 0 clamp(12px, 2vw, 16px) 0',
                 color: '#111827',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                flexWrap: 'wrap'
             }}>
-                {icon && <span style={{ color: '#E31937', display: 'flex', alignItems: 'center' }}>{icon}</span>}
+                {icon && <span style={{ color: '#E31937', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{icon}</span>}
                 {title}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -371,12 +381,13 @@ function ReportSection({ title, data, icon }) {
                     return (
                         <div key={key} style={{
                             display: 'flex',
-                            justifyContent: 'space-between',
+                            flexDirection: 'column',
+                            gap: '4px',
                             padding: '8px 0',
                             borderBottom: '1px solid #e5e7eb'
                         }}>
-                            <span style={{ color: '#6b7280', fontWeight: 500 }}>{displayKey}:</span>
-                            <span style={{ color: '#111827', fontWeight: 400, textAlign: 'right', maxWidth: '60%' }}>
+                            <span style={{ color: '#6b7280', fontWeight: 500, fontSize: 'clamp(13px, 2.5vw, 14px)' }}>{displayKey}:</span>
+                            <span style={{ color: '#111827', fontWeight: 400, fontSize: 'clamp(13px, 2.5vw, 14px)', wordBreak: 'break-word' }}>
                                 {Array.isArray(value) ? value.join(', ') : String(value)}
                             </span>
                         </div>
@@ -396,19 +407,20 @@ function SampleReportSection({ title, data, icon }) {
         <div style={{
             backgroundColor: '#f9fafb',
             borderRadius: '12px',
-            padding: '20px',
+            padding: 'clamp(16px, 3vw, 20px)',
             border: '1px solid #e5e7eb'
         }}>
             <h3 style={{
-                fontSize: '18px',
+                fontSize: 'clamp(16px, 3vw, 18px)',
                 fontWeight: 600,
-                margin: '0 0 16px 0',
+                margin: '0 0 clamp(12px, 2vw, 16px) 0',
                 color: '#111827',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                flexWrap: 'wrap'
             }}>
-                {icon && <span style={{ color: '#E31937', display: 'flex', alignItems: 'center' }}>{icon}</span>}
+                {icon && <span style={{ color: '#E31937', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{icon}</span>}
                 {title}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -418,12 +430,13 @@ function SampleReportSection({ title, data, icon }) {
                     return (
                         <div key={key} style={{
                             display: 'flex',
-                            justifyContent: 'space-between',
+                            flexDirection: 'column',
+                            gap: '4px',
                             padding: '8px 0',
                             borderBottom: '1px solid #e5e7eb'
                         }}>
-                            <span style={{ color: '#6b7280', fontWeight: 500 }}>{displayKey}:</span>
-                            <span style={{ color: '#111827', fontWeight: 400, textAlign: 'right', maxWidth: '60%' }}>
+                            <span style={{ color: '#6b7280', fontWeight: 500, fontSize: 'clamp(13px, 2.5vw, 14px)' }}>{displayKey}:</span>
+                            <span style={{ color: '#111827', fontWeight: 400, fontSize: 'clamp(13px, 2.5vw, 14px)', wordBreak: 'break-word' }}>
                                 {Array.isArray(value) ? value.slice(0, 2).join(', ') + (value.length > 2 ? '...' : '') : String(value).substring(0, 50) + (String(value).length > 50 ? '...' : '')}
                             </span>
                         </div>
@@ -432,7 +445,7 @@ function SampleReportSection({ title, data, icon }) {
                 <div style={{
                     padding: '8px 0',
                     color: '#6b7280',
-                    fontSize: '14px',
+                    fontSize: 'clamp(12px, 2.5vw, 14px)',
                     fontStyle: 'italic'
                 }}>
                     + {Object.keys(data).length - sampleData.length} more details in full report
@@ -452,15 +465,6 @@ function PageContent() {
     const [showFinalReport, setShowFinalReport] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-    useEffect(() => {
-        // Check if returning from successful payment
-        const paid = searchParams.get('paid');
-        const vinParam = searchParams.get('vin');
-        if (paid === 'true' && vinParam && report && vinParam === report.vin) {
-            setShowFinalReport(true);
-        }
-    }, [searchParams, report]);
-
     const checkPaymentStatus = (vinToCheck) => {
         if (!vinToCheck) return false;
         const paymentKey = `payment_${vinToCheck}`;
@@ -476,8 +480,58 @@ function PageContent() {
         return false;
     };
 
+    useEffect(() => {
+        const vinParam = searchParams.get('vin');
+        const paid = searchParams.get('paid');
+        
+        if (vinParam) {
+            // Check payment status
+            const hasPaid = checkPaymentStatus(vinParam);
+            
+            if (hasPaid) {
+                // Check if report exists in sessionStorage
+                const storedReport = sessionStorage.getItem(`report_${vinParam}`);
+                if (storedReport) {
+                    try {
+                        const parsedReport = JSON.parse(storedReport);
+                        setReport(parsedReport);
+                        setShowFinalReport(true);
+                        return;
+                    } catch (e) {
+                        console.error('Failed to parse stored report:', e);
+                    }
+                }
+                
+                // If report is already loaded and matches VIN, show final report
+                if (report && vinParam === report.vin) {
+                    setShowFinalReport(true);
+                }
+            }
+        }
+    }, [searchParams, report]);
+
     const handleShowFinalReport = async () => {
-        if (!report || !report.vin) return;
+        if (!report || !report.vin) {
+            // Try to restore report from sessionStorage
+            const vinParam = searchParams.get('vin');
+            if (vinParam) {
+                const storedReport = sessionStorage.getItem(`report_${vinParam}`);
+                if (storedReport) {
+                    try {
+                        const parsedReport = JSON.parse(storedReport);
+                        setReport(parsedReport);
+                        const hasPaid = checkPaymentStatus(vinParam);
+                        if (hasPaid) {
+                            setShowFinalReport(true);
+                            return;
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse stored report:', e);
+                    }
+                }
+            }
+            return;
+        }
 
         // Check if payment has been completed
         const hasPaid = checkPaymentStatus(report.vin);
@@ -557,6 +611,10 @@ function PageContent() {
 
                 setReport(data.report);
                 setShowFinalReport(false);
+                // Store report in sessionStorage for payment redirect
+                if (data.report && data.report.vin) {
+                    sessionStorage.setItem(`report_${data.report.vin}`, JSON.stringify(data.report));
+                }
             } catch (err) {
                 setApiError(err.message || 'An error occurred while generating the report');
             } finally {
@@ -566,6 +624,10 @@ function PageContent() {
     };
 
     const handleNewReport = () => {
+        // Clear sessionStorage
+        if (report && report.vin) {
+            sessionStorage.removeItem(`report_${report.vin}`);
+        }
         setReport(null);
         setVin('');
         setError('');
@@ -582,31 +644,37 @@ function PageContent() {
         return (
             <div style={{
                 minHeight: '100vh',
-                padding: '40px 20px',
-                backgroundColor: '#ffffff'
+                padding: 'clamp(20px, 5vw, 40px) clamp(16px, 4vw, 20px)',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                position: 'relative'
             }}>
                 <div style={{
                     maxWidth: '1200px',
                     margin: '0 auto',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '24px'
+                    gap: 'clamp(16px, 3vw, 24px)'
                 }}>
                     <div style={{
                         display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
+                        flexDirection: 'column',
+                        gap: '16px',
                         marginBottom: '8px'
                     }}>
-                        <div>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px',
+                            flex: 1
+                        }}>
                             <h1 style={{
-                                fontSize: '28px',
+                                fontSize: 'clamp(24px, 5vw, 28px)',
                                 fontWeight: 600,
-                                margin: '0 0 8px 0',
+                                margin: 0,
                                 color: '#111827'
                             }}>Sample Report</h1>
                             <p style={{
-                                fontSize: '16px',
+                                fontSize: 'clamp(14px, 3vw, 16px)',
                                 color: '#6b7280',
                                 margin: 0
                             }}>VIN: {report.vin}</p>
@@ -615,17 +683,20 @@ function PageContent() {
                             onClick={handleShowFinalReport}
                             disabled={checkoutLoading}
                             style={{
-                                padding: '12px 24px',
+                                padding: 'clamp(10px, 2vw, 12px) clamp(16px, 4vw, 24px)',
                                 backgroundColor: checkoutLoading ? '#9ca3af' : '#E31937',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '8px',
                                 cursor: checkoutLoading ? 'not-allowed' : 'pointer',
-                                fontSize: '16px',
+                                fontSize: 'clamp(14px, 3vw, 16px)',
                                 fontWeight: 600,
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '8px'
+                                justifyContent: 'center',
+                                gap: '8px',
+                                width: '100%',
+                                minHeight: '44px'
                             }}
                         >
                             {checkoutLoading ? (
@@ -653,17 +724,18 @@ function PageContent() {
                             backgroundColor: '#f5f5f5',
                             border: '1px solid #E31937',
                             borderRadius: '12px',
-                            padding: '20px',
+                            padding: 'clamp(16px, 3vw, 20px)',
                             marginBottom: '8px'
                         }}>
                             <h2 style={{
-                                fontSize: '20px',
+                                fontSize: 'clamp(18px, 4vw, 20px)',
                                 fontWeight: 600,
-                                margin: '0 0 12px 0',
+                                margin: '0 0 clamp(10px, 2vw, 12px) 0',
                                 color: '#171717',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                gap: '10px',
+                                flexWrap: 'wrap'
                             }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#171717"/>
@@ -671,10 +743,11 @@ function PageContent() {
                                 Summary
                             </h2>
                             <p style={{
-                                fontSize: '16px',
+                                fontSize: 'clamp(14px, 3vw, 16px)',
                                 color: '#171717',
                                 margin: 0,
-                                lineHeight: '1.6'
+                                lineHeight: '1.6',
+                                wordBreak: 'break-word'
                             }}>{report.analysis.summary}</p>
                         </div>
                     )}
@@ -682,25 +755,26 @@ function PageContent() {
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '20px'
+                        gap: 'clamp(16px, 3vw, 20px)'
                     }}>
                         {report.vinBreakdown && (
                             <div style={{
                                 backgroundColor: '#f9fafb',
                                 borderRadius: '12px',
-                                padding: '20px',
+                                padding: 'clamp(16px, 3vw, 20px)',
                                 border: '1px solid #e5e7eb'
                             }}>
                                 <h3 style={{
-                                    fontSize: '18px',
+                                    fontSize: 'clamp(16px, 3vw, 18px)',
                                     fontWeight: 600,
-                                    margin: '0 0 20px 0',
+                                    margin: '0 0 clamp(16px, 3vw, 20px) 0',
                                     color: '#111827',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '10px'
+                                    gap: '10px',
+                                    flexWrap: 'wrap'
                                 }}>
-                                    <span style={{ color: '#E31937', display: 'flex', alignItems: 'center' }}>{Icons.vin}</span>
+                                    <span style={{ color: '#E31937', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{Icons.vin}</span>
                                     VIN Breakdown
                                 </h3>
                                 
@@ -708,25 +782,28 @@ function PageContent() {
                                     <div style={{
                                         backgroundColor: '#ffffff',
                                         borderRadius: '8px',
-                                        padding: '16px',
-                                        marginBottom: '20px',
+                                        padding: 'clamp(12px, 2vw, 16px)',
+                                        marginBottom: 'clamp(16px, 3vw, 20px)',
                                         border: '1px solid #e5e7eb',
                                         fontFamily: 'monospace',
-                                        fontSize: '20px',
-                                        letterSpacing: '4px',
+                                        fontSize: 'clamp(14px, 3vw, 20px)',
+                                        letterSpacing: 'clamp(2px, 0.5vw, 4px)',
                                         textAlign: 'center',
                                         fontWeight: 600,
-                                        color: '#111827'
+                                        color: '#111827',
+                                        overflowX: 'auto'
                                     }}>
-                                        {report.vin.split('').map((char, index) => (
-                                            <span key={index} style={{
-                                                display: 'inline-block',
-                                                width: '24px',
-                                                textAlign: 'center',
-                                                borderBottom: '2px solid #E31937',
-                                                paddingBottom: '4px'
-                                            }}>{char}</span>
-                                        ))}
+                                        <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '2px' }}>
+                                            {report.vin.split('').map((char, index) => (
+                                                <span key={index} style={{
+                                                    display: 'inline-block',
+                                                    minWidth: 'clamp(18px, 3vw, 24px)',
+                                                    textAlign: 'center',
+                                                    borderBottom: '2px solid #E31937',
+                                                    paddingBottom: '4px'
+                                                }}>{char}</span>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
 
@@ -786,46 +863,6 @@ function PageContent() {
                             <SampleReportSection title="Internet Insights" data={report.internetInsights} icon={Icons.internet} />
                         )}
                     </div>
-
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        marginTop: '32px'
-                    }}>
-                        <button
-                            onClick={handleShowFinalReport}
-                            disabled={checkoutLoading}
-                            style={{
-                                padding: '14px 32px',
-                                backgroundColor: checkoutLoading ? '#9ca3af' : '#E31937',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                cursor: checkoutLoading ? 'not-allowed' : 'pointer',
-                                fontSize: '18px',
-                                fontWeight: 600,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '10px'
-                            }}
-                        >
-                            {checkoutLoading ? (
-                                <>
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'spin 1s linear infinite' }}>
-                                        <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" strokeDasharray="22" strokeDashoffset="11" strokeLinecap="round" opacity="0.5"/>
-                                    </svg>
-                                    Loading...
-                                </>
-                            ) : (
-                                <>
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                    View Full Final Report
-                                </>
-                            )}
-                        </button>
-                    </div>
                 </div>
             </div>
         );
@@ -870,50 +907,64 @@ function PageContent() {
         return (
             <div style={{
                 minHeight: '100vh',
-                padding: '40px 20px',
-                backgroundColor: '#ffffff'
+                padding: 'clamp(20px, 5vw, 40px) clamp(16px, 4vw, 20px)',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                position: 'relative'
             }}>
                 <div style={{
                     maxWidth: '1200px',
                     margin: '0 auto',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '24px'
+                    gap: 'clamp(16px, 3vw, 24px)'
                 }}>
                     <div style={{
                         display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
+                        flexDirection: 'column',
+                        gap: '16px',
                         marginBottom: '8px'
                     }}>
-                        <div>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px',
+                            flex: 1
+                        }}>
                             <h1 style={{
-                                fontSize: '28px',
+                                fontSize: 'clamp(24px, 5vw, 28px)',
                                 fontWeight: 600,
-                                margin: '0 0 8px 0',
+                                margin: 0,
                                 color: '#111827'
                             }}>Final Report</h1>
                             <p style={{
-                                fontSize: '16px',
+                                fontSize: 'clamp(14px, 3vw, 16px)',
                                 color: '#6b7280',
                                 margin: 0
                             }}>VIN: {report.vin}</p>
                         </div>
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <div style={{ 
+                            display: 'flex', 
+                            flexDirection: 'column',
+                            gap: '12px',
+                            width: '100%'
+                        }}>
                             <button
                                 onClick={handlePrint}
                                 style={{
-                                    padding: '10px 20px',
+                                    padding: 'clamp(10px, 2vw, 12px) clamp(16px, 4vw, 20px)',
                                     backgroundColor: '#6b7280',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
-                                    fontSize: '14px',
+                                    fontSize: 'clamp(13px, 2.5vw, 14px)',
                                     fontWeight: 500,
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '8px'
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    minHeight: '44px',
+                                    width: '100%'
                                 }}
                             >
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -926,17 +977,20 @@ function PageContent() {
                             <button
                                 onClick={handleNewReport}
                                 style={{
-                                    padding: '10px 20px',
+                                    padding: 'clamp(10px, 2vw, 12px) clamp(16px, 4vw, 20px)',
                                     backgroundColor: '#E31937',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
-                                    fontSize: '14px',
+                                    fontSize: 'clamp(13px, 2.5vw, 14px)',
                                     fontWeight: 500,
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '8px'
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    minHeight: '44px',
+                                    width: '100%'
                                 }}
                             >
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -954,17 +1008,18 @@ function PageContent() {
                             backgroundColor: '#f5f5f5',
                             border: '1px solid #E31937',
                             borderRadius: '12px',
-                            padding: '20px',
+                            padding: 'clamp(16px, 3vw, 20px)',
                             marginBottom: '8px'
                         }}>
                             <h2 style={{
-                                fontSize: '20px',
+                                fontSize: 'clamp(18px, 4vw, 20px)',
                                 fontWeight: 600,
-                                margin: '0 0 12px 0',
+                                margin: '0 0 clamp(10px, 2vw, 12px) 0',
                                 color: '#171717',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                gap: '10px',
+                                flexWrap: 'wrap'
                             }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z" fill="#171717"/>
@@ -972,10 +1027,11 @@ function PageContent() {
                                 Summary
                             </h2>
                             <p style={{
-                                fontSize: '16px',
+                                fontSize: 'clamp(14px, 3vw, 16px)',
                                 color: '#171717',
                                 margin: 0,
-                                lineHeight: '1.6'
+                                lineHeight: '1.6',
+                                wordBreak: 'break-word'
                             }}>{report.analysis.summary}</p>
                         </div>
                     )}
@@ -983,7 +1039,7 @@ function PageContent() {
                     <div style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '20px'
+                        gap: 'clamp(16px, 3vw, 20px)'
                     }}>
                         {report.vinBreakdown && (
                             <VinBreakdown vin={report.vin} data={report.vinBreakdown} />
@@ -1039,17 +1095,18 @@ function PageContent() {
                         <div style={{
                             backgroundColor: '#f9fafb',
                             borderRadius: '12px',
-                            padding: '20px',
+                            padding: 'clamp(16px, 3vw, 20px)',
                             border: '1px solid #e5e7eb'
                         }}>
                             <h3 style={{
-                                fontSize: '18px',
+                                fontSize: 'clamp(16px, 3vw, 18px)',
                                 fontWeight: 600,
-                                margin: '0 0 16px 0',
+                                margin: '0 0 clamp(12px, 2vw, 16px) 0',
                                 color: '#111827',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                gap: '10px',
+                                flexWrap: 'wrap'
                             }}>
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM9 13V11H11V13H9ZM9 7V9H11V7H9Z" fill="#111827"/>
@@ -1058,7 +1115,7 @@ function PageContent() {
                             </h3>
                             <ul style={{
                                 margin: 0,
-                                paddingLeft: '20px',
+                                paddingLeft: 'clamp(16px, 3vw, 20px)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '8px'
@@ -1066,7 +1123,9 @@ function PageContent() {
                                 {report.analysis.keyFindings.map((finding, index) => (
                                     <li key={index} style={{
                                         color: '#374151',
-                                        lineHeight: '1.6'
+                                        lineHeight: '1.6',
+                                        fontSize: 'clamp(13px, 2.5vw, 14px)',
+                                        wordBreak: 'break-word'
                                     }}>{finding}</li>
                                 ))}
                             </ul>
@@ -1077,17 +1136,18 @@ function PageContent() {
                         <div style={{
                             backgroundColor: '#f5f5f5',
                             borderRadius: '12px',
-                            padding: '20px',
+                            padding: 'clamp(16px, 3vw, 20px)',
                             border: '1px solid #E31937'
                         }}>
                             <h3 style={{
-                                fontSize: '18px',
+                                fontSize: 'clamp(16px, 3vw, 18px)',
                                 fontWeight: 600,
-                                margin: '0 0 16px 0',
+                                margin: '0 0 clamp(12px, 2vw, 16px) 0',
                                 color: '#171717',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                gap: '10px',
+                                flexWrap: 'wrap'
                             }}>
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M10 2L12.5 7.5L18 8L14 12L15 18L10 15L5 18L6 12L2 8L7.5 7.5L10 2Z" fill="#171717"/>
@@ -1096,7 +1156,7 @@ function PageContent() {
                             </h3>
                             <ul style={{
                                 margin: 0,
-                                paddingLeft: '20px',
+                                paddingLeft: 'clamp(16px, 3vw, 20px)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '8px'
@@ -1104,7 +1164,9 @@ function PageContent() {
                                 {report.analysis.recommendations.map((rec, index) => (
                                     <li key={index} style={{
                                         color: '#171717',
-                                        lineHeight: '1.6'
+                                        lineHeight: '1.6',
+                                        fontSize: 'clamp(13px, 2.5vw, 14px)',
+                                        wordBreak: 'break-word'
                                     }}>{rec}</li>
                                 ))}
                             </ul>
@@ -1115,17 +1177,18 @@ function PageContent() {
                         <div style={{
                             backgroundColor: '#f5f5f5',
                             borderRadius: '12px',
-                            padding: '20px',
+                            padding: 'clamp(16px, 3vw, 20px)',
                             border: '1px solid #E31937'
                         }}>
                             <h3 style={{
-                                fontSize: '18px',
+                                fontSize: 'clamp(16px, 3vw, 18px)',
                                 fontWeight: 600,
-                                margin: '0 0 16px 0',
+                                margin: '0 0 clamp(12px, 2vw, 16px) 0',
                                 color: '#171717',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                gap: '10px',
+                                flexWrap: 'wrap'
                             }}>
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM11 14H9V12H11V14ZM11 10H9V6H11V10Z" fill="#171717"/>
@@ -1134,7 +1197,7 @@ function PageContent() {
                             </h3>
                             <ul style={{
                                 margin: 0,
-                                paddingLeft: '20px',
+                                paddingLeft: 'clamp(16px, 3vw, 20px)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '8px'
@@ -1142,7 +1205,9 @@ function PageContent() {
                                 {report.analysis.insights.map((insight, index) => (
                                     <li key={index} style={{
                                         color: '#171717',
-                                        lineHeight: '1.6'
+                                        lineHeight: '1.6',
+                                        fontSize: 'clamp(13px, 2.5vw, 14px)',
+                                        wordBreak: 'break-word'
                                     }}>{insight}</li>
                                 ))}
                             </ul>
@@ -1153,17 +1218,18 @@ function PageContent() {
                         <div style={{
                             backgroundColor: '#f5f5f5',
                             borderRadius: '12px',
-                            padding: '20px',
+                            padding: 'clamp(16px, 3vw, 20px)',
                             border: '1px solid #E31937'
                         }}>
                             <h3 style={{
-                                fontSize: '18px',
+                                fontSize: 'clamp(16px, 3vw, 18px)',
                                 fontWeight: 600,
-                                margin: '0 0 16px 0',
+                                margin: '0 0 clamp(12px, 2vw, 16px) 0',
                                 color: '#171717',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                gap: '10px',
+                                flexWrap: 'wrap'
                             }}>
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M10 2L12.5 7.5L18 8L14 12L15 18L10 15L5 18L6 12L2 8L7.5 7.5L10 2Z" fill="#171717"/>
@@ -1172,7 +1238,7 @@ function PageContent() {
                             </h3>
                             <ul style={{
                                 margin: 0,
-                                paddingLeft: '20px',
+                                paddingLeft: 'clamp(16px, 3vw, 20px)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '8px'
@@ -1180,7 +1246,9 @@ function PageContent() {
                                 {report.analysis.notableFeatures.map((feature, index) => (
                                     <li key={index} style={{
                                         color: '#171717',
-                                        lineHeight: '1.6'
+                                        lineHeight: '1.6',
+                                        fontSize: 'clamp(13px, 2.5vw, 14px)',
+                                        wordBreak: 'break-word'
                                     }}>{feature}</li>
                                 ))}
                             </ul>
@@ -1191,17 +1259,18 @@ function PageContent() {
                         <div style={{
                             backgroundColor: '#f5f5f5',
                             borderRadius: '12px',
-                            padding: '20px',
+                            padding: 'clamp(16px, 3vw, 20px)',
                             border: '1px solid #E31937'
                         }}>
                             <h3 style={{
-                                fontSize: '18px',
+                                fontSize: 'clamp(16px, 3vw, 18px)',
                                 fontWeight: 600,
-                                margin: '0 0 16px 0',
+                                margin: '0 0 clamp(12px, 2vw, 16px) 0',
                                 color: '#171717',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '10px'
+                                gap: '10px',
+                                flexWrap: 'wrap'
                             }}>
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM9 13V11H11V13H9ZM9 7V9H11V7H9Z" fill="#171717"/>
@@ -1210,7 +1279,7 @@ function PageContent() {
                             </h3>
                             <ul style={{
                                 margin: 0,
-                                paddingLeft: '20px',
+                                paddingLeft: 'clamp(16px, 3vw, 20px)',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '8px'
@@ -1218,7 +1287,9 @@ function PageContent() {
                                 {report.analysis.considerations.map((consideration, index) => (
                                     <li key={index} style={{
                                         color: '#171717',
-                                        lineHeight: '1.6'
+                                        lineHeight: '1.6',
+                                        fontSize: 'clamp(13px, 2.5vw, 14px)',
+                                        wordBreak: 'break-word'
                                     }}>{consideration}</li>
                                 ))}
                             </ul>
@@ -1226,16 +1297,17 @@ function PageContent() {
                     )}
 
                     <div style={{
-                        marginTop: '32px',
-                        paddingTop: '24px',
+                        marginTop: 'clamp(24px, 4vw, 32px)',
+                        paddingTop: 'clamp(20px, 3vw, 24px)',
                         borderTop: '1px solid #e5e7eb'
                     }}>
                         <p style={{
-                            fontSize: '12px',
+                            fontSize: 'clamp(11px, 2vw, 12px)',
                             color: '#6b7280',
                             margin: 0,
                             lineHeight: '1.6',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            wordBreak: 'break-word'
                         }}>
                             This report is generated based on VIN decoding standards and may contain estimated or inferred information. 
                             Always verify critical information through official Tesla channels. Information accuracy is not guaranteed.
@@ -1247,18 +1319,54 @@ function PageContent() {
     }
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', flexDirection: 'column', gap: '20px', padding: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <h1 style={{ fontWeight: 600, fontSize: '24px', margin: 0 }}>
-                    <label htmlFor="vin-input" style={{ cursor: 'pointer' }}>
+        <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            height: '100vh',
+            maxHeight: '100vh',
+            overflow: 'hidden',
+            flexDirection: 'column', 
+            gap: '20px', 
+            padding: '20px',
+            position: 'relative'
+        }}>
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                gap: '8px',
+                position: 'relative',
+                zIndex: 1
+            }}>
+                <h1 style={{ 
+                    fontWeight: 600, 
+                    fontSize: '48px', 
+                    margin: 0, 
+                    color: '#ffffff'
+                }}>
+                    <label htmlFor="vin-input" style={{ cursor: 'pointer', color: '#ffffff' }}>
                         TESLA VIN REPORT
                     </label>
                 </h1>
-                <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
+                <p style={{ 
+                    fontSize: '14px', 
+                    color: '#ffffff', 
+                    margin: 0
+                }}>
                     Enter your Tesla VIN to generate a detailed report
                 </p>
             </div>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center', width: '100%', maxWidth: '400px' }}>
+            <form onSubmit={handleSubmit} style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '12px', 
+                alignItems: 'center', 
+                width: '100%', 
+                maxWidth: '400px',
+                position: 'relative',
+                zIndex: 1
+            }}>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch', width: '100%' }}>
                     <input
                         id="vin-input"
@@ -1317,6 +1425,29 @@ function PageContent() {
                     </p>
                 )}
             </form>
+            <div style={{
+                position: 'absolute',
+                bottom: '20px',
+                right: '20px',
+                zIndex: 1
+            }}>
+                <a 
+                    href="https://www.repairwise.pro/blog/how-to-maximize-the-lifespan-of-your-tesla-model-3-tires"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                        fontSize: '10px',
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                    }}
+                >
+                    <span>CC</span>
+                    <span>Image via RepairWise</span>
+                </a>
+            </div>
         </div>
     );
 }
