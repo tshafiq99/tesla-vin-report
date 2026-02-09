@@ -1,0 +1,16 @@
+{
+  "name": "Tesla VIN Report",
+  "short_name": "Tesla VIN",
+  "description": "Comprehensive Tesla VIN decoder and analysis tool",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#E31937",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

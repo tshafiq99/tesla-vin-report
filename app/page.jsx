@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 const TESLA_VIN_PREFIXES = [
     '5YJ', // Model S/X Fremont
@@ -441,13 +442,76 @@ function SampleReportSection({ title, data, icon }) {
     );
 }
 
-export default function Page() {
+function PageContent() {
+    const searchParams = useSearchParams();
     const [vin, setVin] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [report, setReport] = useState(null);
     const [apiError, setApiError] = useState('');
     const [showFinalReport, setShowFinalReport] = useState(false);
+    const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+    useEffect(() => {
+        // Check if returning from successful payment
+        const paid = searchParams.get('paid');
+        const vinParam = searchParams.get('vin');
+        if (paid === 'true' && vinParam && report && vinParam === report.vin) {
+            setShowFinalReport(true);
+        }
+    }, [searchParams, report]);
+
+    const checkPaymentStatus = (vinToCheck) => {
+        if (!vinToCheck) return false;
+        const paymentKey = `payment_${vinToCheck}`;
+        const paymentData = localStorage.getItem(paymentKey);
+        if (paymentData) {
+            try {
+                const parsed = JSON.parse(paymentData);
+                return parsed.paid === true;
+            } catch (e) {
+                return false;
+            }
+        }
+        return false;
+    };
+
+    const handleShowFinalReport = async () => {
+        if (!report || !report.vin) return;
+
+        // Check if payment has been completed
+        const hasPaid = checkPaymentStatus(report.vin);
+        
+        if (hasPaid) {
+            setShowFinalReport(true);
+        } else {
+            // Redirect to Stripe checkout
+            setCheckoutLoading(true);
+            try {
+                const response = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ vin: report.vin }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to create checkout session');
+                }
+
+                // Redirect to Stripe checkout
+                if (data.url) {
+                    window.location.href = data.url;
+                }
+            } catch (err) {
+                setApiError(err.message || 'Failed to start checkout process');
+                setCheckoutLoading(false);
+            }
+        }
+    };
 
     const handleVinChange = (e) => {
         const value = e.target.value.toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '');
@@ -509,9 +573,6 @@ export default function Page() {
         setShowFinalReport(false);
     };
 
-    const handleShowFinalReport = () => {
-        setShowFinalReport(true);
-    };
 
     const handlePrint = () => {
         window.print();
@@ -552,13 +613,14 @@ export default function Page() {
                         </div>
                         <button
                             onClick={handleShowFinalReport}
+                            disabled={checkoutLoading}
                             style={{
                                 padding: '12px 24px',
-                                backgroundColor: '#E31937',
+                                backgroundColor: checkoutLoading ? '#9ca3af' : '#E31937',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '8px',
-                                cursor: 'pointer',
+                                cursor: checkoutLoading ? 'not-allowed' : 'pointer',
                                 fontSize: '16px',
                                 fontWeight: 600,
                                 display: 'flex',
@@ -566,10 +628,21 @@ export default function Page() {
                                 gap: '8px'
                             }}
                         >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                            Go to Final Report
+                            {checkoutLoading ? (
+                                <>
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'spin 1s linear infinite' }}>
+                                        <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" strokeDasharray="22" strokeDashoffset="11" strokeLinecap="round" opacity="0.5"/>
+                                    </svg>
+                                    Loading...
+                                </>
+                            ) : (
+                                <>
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                    Go to Final Report
+                                </>
+                            )}
                         </button>
                     </div>
 
@@ -721,13 +794,14 @@ export default function Page() {
                     }}>
                         <button
                             onClick={handleShowFinalReport}
+                            disabled={checkoutLoading}
                             style={{
                                 padding: '14px 32px',
-                                backgroundColor: '#E31937',
+                                backgroundColor: checkoutLoading ? '#9ca3af' : '#E31937',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '8px',
-                                cursor: 'pointer',
+                                cursor: checkoutLoading ? 'not-allowed' : 'pointer',
                                 fontSize: '18px',
                                 fontWeight: 600,
                                 display: 'flex',
@@ -735,15 +809,61 @@ export default function Page() {
                                 gap: '10px'
                             }}
                         >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                            View Full Final Report
+                            {checkoutLoading ? (
+                                <>
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'spin 1s linear infinite' }}>
+                                        <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" strokeDasharray="22" strokeDashoffset="11" strokeLinecap="round" opacity="0.5"/>
+                                    </svg>
+                                    Loading...
+                                </>
+                            ) : (
+                                <>
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                    View Full Final Report
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>
             </div>
         );
+    }
+
+    if (report && showFinalReport) {
+        // Verify payment before showing final report
+        const hasPaid = checkPaymentStatus(report.vin);
+        if (!hasPaid) {
+            // Payment not verified, redirect back to sample report
+            return (
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '100vh',
+                    flexDirection: 'column',
+                    gap: '20px'
+                }}>
+                    <p style={{ color: '#E31937', fontSize: '18px' }}>
+                        Payment verification required to view Final Report
+                    </p>
+                    <button
+                        onClick={() => setShowFinalReport(false)}
+                        style={{
+                            padding: '10px 20px',
+                            backgroundColor: '#E31937',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Return to Sample Report
+                    </button>
+                </div>
+            );
+        }
     }
 
     if (report && showFinalReport) {
@@ -1129,9 +1249,11 @@ export default function Page() {
     return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', flexDirection: 'column', gap: '20px', padding: '20px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <label htmlFor="vin-input" style={{ fontWeight: 600, fontSize: '24px', margin: 0 }}>
-                    TESLA VIN REPORT
-                </label>
+                <h1 style={{ fontWeight: 600, fontSize: '24px', margin: 0 }}>
+                    <label htmlFor="vin-input" style={{ cursor: 'pointer' }}>
+                        TESLA VIN REPORT
+                    </label>
+                </h1>
                 <p style={{ fontSize: '14px', color: '#6b7280', margin: 0 }}>
                     Enter your Tesla VIN to generate a detailed report
                 </p>
@@ -1196,5 +1318,22 @@ export default function Page() {
                 )}
             </form>
         </div>
+    );
+}
+
+export default function Page() {
+    return (
+        <Suspense fallback={
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh'
+            }}>
+                <p>Loading...</p>
+            </div>
+        }>
+            <PageContent />
+        </Suspense>
     );
 }
