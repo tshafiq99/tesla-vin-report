@@ -18,14 +18,14 @@ export async function POST(request) {
 
         if (!process.env.STRIPE_SECRET_KEY) {
             return NextResponse.json(
-                { error: 'Stripe secret key not configured' },
+                { error: 'Stripe is not configured. Add STRIPE_SECRET_KEY to your environment.' },
                 { status: 500 }
             );
         }
 
         if (!PRODUCT_ID || !PRICE_ID) {
             return NextResponse.json(
-                { error: 'Stripe product or price ID not configured' },
+                { error: 'Stripe product/price not configured. Add STRIPE_PRODUCT_ID and STRIPE_PRICE_ID to your environment.' },
                 { status: 500 }
             );
         }
@@ -49,8 +49,9 @@ export async function POST(request) {
         return NextResponse.json({ sessionId: session.id, url: session.url });
     } catch (error) {
         console.error('Stripe checkout error:', error);
+        const message = error?.message || 'Failed to create checkout session';
         return NextResponse.json(
-            { error: 'Failed to create checkout session' },
+            { error: message },
             { status: 500 }
         );
     }

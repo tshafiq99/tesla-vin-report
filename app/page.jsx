@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 const TESLA_VIN_PREFIXES = [
@@ -265,6 +265,32 @@ const Icons = {
             <path d="M10 2C5.58172 2 2 5.58172 2 10M18 10C18 14.4183 14.4183 18 10 18M3.5 6.5L16.5 13.5M16.5 6.5L3.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             <circle cx="10" cy="10" r="2" fill="currentColor"/>
         </svg>
+    ),
+    keyFindings: (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 3H4C3.44772 3 3 3.44772 3 4V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V11" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M14 2L18 6L10 14H7V11L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    ),
+    recommendations: (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2L12.5 7.5L18 8L14 12L15 18L10 15L5 18L6 12L2 8L7.5 7.5L10 2Z" fill="currentColor"/>
+        </svg>
+    ),
+    insights: (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM11 14H9V12H11V14ZM11 10H9V6H11V10Z" fill="currentColor"/>
+        </svg>
+    ),
+    notableFeatures: (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2L12 7L18 8L14 12L15 18L10 15L5 18L6 12L2 8L8 7L10 2Z" fill="currentColor"/>
+        </svg>
+    ),
+    considerations: (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM9 13V11H11V13H9ZM9 7V9H11V7H9Z" fill="currentColor"/>
+        </svg>
     )
 };
 
@@ -287,11 +313,11 @@ function TableOfContents({ report }) {
     if (report.chargingCompatibility) sections.push({ title: 'Charging Compatibility', icon: Icons.charging });
     if (report.softwareAndUpdates) sections.push({ title: 'Software & Updates', icon: Icons.software });
     if (report.internetInsights) sections.push({ title: 'Internet Insights', icon: Icons.internet });
-    if (report.analysis?.keyFindings) sections.push({ title: 'Key Findings', icon: null });
-    if (report.analysis?.recommendations) sections.push({ title: 'Recommendations', icon: null });
-    if (report.analysis?.insights) sections.push({ title: 'Additional Insights', icon: null });
-    if (report.analysis?.notableFeatures) sections.push({ title: 'Notable Features', icon: null });
-    if (report.analysis?.considerations) sections.push({ title: 'Important Considerations', icon: null });
+    if (report.analysis?.keyFindings) sections.push({ title: 'Key Findings', icon: Icons.keyFindings });
+    if (report.analysis?.recommendations) sections.push({ title: 'Recommendations', icon: Icons.recommendations });
+    if (report.analysis?.insights) sections.push({ title: 'Additional Insights', icon: Icons.insights });
+    if (report.analysis?.notableFeatures) sections.push({ title: 'Notable Features', icon: Icons.notableFeatures });
+    if (report.analysis?.considerations) sections.push({ title: 'Important Considerations', icon: Icons.considerations });
 
     if (sections.length === 0) return null;
 
@@ -465,6 +491,16 @@ function PageContent() {
     const [showFinalReport, setShowFinalReport] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
     const [paymentVerified, setPaymentVerified] = useState(null);
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        if (!videoRef.current) return;
+        if (loading) {
+            videoRef.current.play().catch(() => {});
+        } else {
+            videoRef.current.pause();
+        }
+    }, [loading]);
 
     const checkPaymentStatus = async (vinToCheck) => {
         if (!vinToCheck) return false;
@@ -542,9 +578,50 @@ function PageContent() {
         loadReportAfterPayment();
     }, [searchParams]);
 
+    useEffect(() => {
+        const verifyPaymentForFinalReport = async () => {
+            if (report && showFinalReport && report.vin) {
+                const hasPaid = await checkPaymentStatus(report.vin);
+                setPaymentVerified(hasPaid);
+                if (!hasPaid) {
+                    setShowFinalReport(false);
+                }
+            } else if (!showFinalReport) {
+                setPaymentVerified(null);
+            }
+        };
+        if (report && showFinalReport) {
+            verifyPaymentForFinalReport();
+        } else {
+            setPaymentVerified(null);
+        }
+    }, [report, showFinalReport]);
+
+    const startStripeCheckout = async (vin) => {
+        setApiError('');
+        setCheckoutLoading(true);
+        try {
+            const response = await fetch('/api/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ vin }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to create checkout session');
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                setApiError('Checkout URL was not returned. Please check Stripe configuration.');
+                setCheckoutLoading(false);
+            }
+        } catch (err) {
+            setApiError(err.message || 'Failed to start checkout process');
+            setCheckoutLoading(false);
+        }
+    };
+
     const handleShowFinalReport = async () => {
         if (!report || !report.vin) {
-            // Try to restore report from sessionStorage
             const vinParam = searchParams.get('vin');
             if (vinParam) {
                 const storedReport = sessionStorage.getItem(`report_${vinParam}`);
@@ -557,6 +634,8 @@ function PageContent() {
                             setShowFinalReport(true);
                             return;
                         }
+                        await startStripeCheckout(vinParam);
+                        return;
                     } catch (e) {
                         console.error('Failed to parse stored report:', e);
                     }
@@ -565,37 +644,11 @@ function PageContent() {
             return;
         }
 
-        // Check if payment has been completed (with server-side verification)
         const hasPaid = await checkPaymentStatus(report.vin);
-        
         if (hasPaid) {
             setShowFinalReport(true);
         } else {
-            // Redirect to Stripe checkout
-            setCheckoutLoading(true);
-            try {
-                const response = await fetch('/api/create-checkout-session', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ vin: report.vin }),
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to create checkout session');
-                }
-
-                // Redirect to Stripe checkout
-                if (data.url) {
-                    window.location.href = data.url;
-                }
-            } catch (err) {
-                setApiError(err.message || 'Failed to start checkout process');
-                setCheckoutLoading(false);
-            }
+            await startStripeCheckout(report.vin);
         }
     };
 
@@ -747,6 +800,11 @@ function PageContent() {
                                 </>
                             )}
                         </button>
+                        {apiError && (
+                            <p style={{ fontSize: '14px', color: '#dc2626', margin: '8px 0 0', textAlign: 'center' }}>
+                                {apiError}
+                            </p>
+                        )}
                     </div>
 
                     <TableOfContents report={report} />
@@ -900,27 +958,6 @@ function PageContent() {
         );
     }
 
-    useEffect(() => {
-        const verifyPaymentForFinalReport = async () => {
-            if (report && showFinalReport && report.vin) {
-                const hasPaid = await checkPaymentStatus(report.vin);
-                setPaymentVerified(hasPaid);
-                if (!hasPaid) {
-                    setShowFinalReport(false);
-                }
-            } else if (!showFinalReport) {
-                // Reset verification state when not showing final report
-                setPaymentVerified(null);
-            }
-        };
-        
-        if (report && showFinalReport) {
-            verifyPaymentForFinalReport();
-        } else {
-            setPaymentVerified(null);
-        }
-    }, [report, showFinalReport]);
-
     if (report && showFinalReport) {
         // Show loading while verifying payment
         if (paymentVerified === null) {
@@ -1019,7 +1056,7 @@ function PageContent() {
                         </div>
                         <div style={{ 
                             display: 'flex', 
-                            flexDirection: 'column',
+                            flexDirection: 'row',
                             gap: '12px',
                             width: '100%'
                         }}>
@@ -1039,7 +1076,7 @@ function PageContent() {
                                     justifyContent: 'center',
                                     gap: '8px',
                                     minHeight: '44px',
-                                    width: '100%'
+                                    flex: 1
                                 }}
                             >
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1065,7 +1102,7 @@ function PageContent() {
                                     justifyContent: 'center',
                                     gap: '8px',
                                     minHeight: '44px',
-                                    width: '100%'
+                                    flex: 1
                                 }}
                             >
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1183,9 +1220,7 @@ function PageContent() {
                                 gap: '10px',
                                 flexWrap: 'wrap'
                             }}>
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM9 13V11H11V13H9ZM9 7V9H11V7H9Z" fill="#111827"/>
-                                </svg>
+                                <span style={{ color: '#E31937', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{Icons.keyFindings}</span>
                                 Key Findings
                             </h3>
                             <ul style={{
@@ -1224,9 +1259,7 @@ function PageContent() {
                                 gap: '10px',
                                 flexWrap: 'wrap'
                             }}>
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 2L12.5 7.5L18 8L14 12L15 18L10 15L5 18L6 12L2 8L7.5 7.5L10 2Z" fill="#171717"/>
-                                </svg>
+                                <span style={{ color: '#E31937', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{Icons.recommendations}</span>
                                 Recommendations
                             </h3>
                             <ul style={{
@@ -1265,9 +1298,7 @@ function PageContent() {
                                 gap: '10px',
                                 flexWrap: 'wrap'
                             }}>
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM11 14H9V12H11V14ZM11 10H9V6H11V10Z" fill="#171717"/>
-                                </svg>
+                                <span style={{ color: '#E31937', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{Icons.insights}</span>
                                 Additional Insights
                             </h3>
                             <ul style={{
@@ -1306,9 +1337,7 @@ function PageContent() {
                                 gap: '10px',
                                 flexWrap: 'wrap'
                             }}>
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 2L12.5 7.5L18 8L14 12L15 18L10 15L5 18L6 12L2 8L7.5 7.5L10 2Z" fill="#171717"/>
-                                </svg>
+                                <span style={{ color: '#E31937', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{Icons.notableFeatures}</span>
                                 Notable Features
                             </h3>
                             <ul style={{
@@ -1347,9 +1376,7 @@ function PageContent() {
                                 gap: '10px',
                                 flexWrap: 'wrap'
                             }}>
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM9 13V11H11V13H9ZM9 7V9H11V7H9Z" fill="#171717"/>
-                                </svg>
+                                <span style={{ color: '#E31937', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{Icons.considerations}</span>
                                 Important Considerations
                             </h3>
                             <ul style={{
@@ -1406,19 +1433,48 @@ function PageContent() {
             padding: '20px',
             position: 'relative'
         }}>
+            <div
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 0,
+                    opacity: loading ? 1 : 0,
+                    transition: 'opacity 0.6s ease',
+                    pointerEvents: 'none'
+                }}
+            >
+                <video
+                    ref={videoRef}
+                    src="/tesla-zoomin.mp4"
+                    muted
+                    playsInline
+                    loop
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                    }}
+                />
+            </div>
             <div style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
                 alignItems: 'center', 
                 gap: '8px',
                 position: 'relative',
-                zIndex: 1
+                zIndex: 1,
+                width: '100%',
+                textAlign: 'center'
             }}>
                 <h1 style={{ 
                     fontWeight: 600, 
-                    fontSize: '48px', 
+                    fontSize: 'clamp(28px, 8vw, 48px)', 
                     margin: 0, 
-                    color: '#ffffff'
+                    color: '#ffffff',
+                    textAlign: 'inherit'
                 }}>
                     <label htmlFor="vin-input" style={{ cursor: 'pointer', color: '#ffffff' }}>
                         TESLA VIN REPORT
@@ -1427,7 +1483,8 @@ function PageContent() {
                 <p style={{ 
                     fontSize: '14px', 
                     color: '#ffffff', 
-                    margin: 0
+                    margin: 0,
+                    textAlign: 'inherit'
                 }}>
                     Enter your Tesla VIN to generate a detailed report
                 </p>
@@ -1511,107 +1568,43 @@ function PageContent() {
                     Reports can take up to 3 minutes as we analyze multiple sources
                 </p>
             </form>
-            <div style={{
+            <style dangerouslySetInnerHTML={{ __html: `
+                .footer-mobile { padding: 0 16px 20px; }
+                .footer-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 12px; }
+                @media (max-width: 480px) {
+                    .footer-links { flex-direction: column; gap: 6px; }
+                    .footer-sep { display: none; }
+                }
+            `}} />
+            <div className="footer-mobile" style={{
                 position: 'absolute',
-                bottom: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
+                bottom: 0,
+                left: 0,
+                right: 0,
                 zIndex: 1,
                 display: 'flex',
-                gap: '16px',
+                flexDirection: 'column',
                 alignItems: 'center',
-                flexWrap: 'wrap',
-                justifyContent: 'center'
+                gap: '10px'
             }}>
-                <span style={{
-                    fontSize: '12px',
-                    color: 'rgba(255, 255, 255, 0.6)'
-                }}>
-                    © 2026 TeslaVINReport
-                </span>
-                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
-                <a 
-                    href="/Blog.txt"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                        fontSize: '12px',
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        textDecoration: 'none',
-                        transition: 'color 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'}
-                    onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}
-                >
-                    Blog
-                </a>
-                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
-                <a 
-                    href="/PrivacyPolicy.txt"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                        fontSize: '12px',
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        textDecoration: 'none',
-                        transition: 'color 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'}
-                    onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}
-                >
-                    Privacy
-                </a>
-                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
-                <a 
-                    href="/llms.txt"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                        fontSize: '12px',
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        textDecoration: 'none',
-                        transition: 'color 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'}
-                    onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}
-                >
-                    For LLMs
-                </a>
-                <span style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
-                <a 
-                    href="https://forms.gle/Mi6MqMfDqWFvbz4AA"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                        fontSize: '12px',
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        textDecoration: 'none',
-                        transition: 'color 0.2s'
-                    }}
-                    onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'}
-                    onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}
-                >
-                    Feature Request
-                </a>
-            </div>
-            <div style={{
-                position: 'absolute',
-                bottom: '20px',
-                right: '20px',
-                zIndex: 1
-            }}>
-                <a 
+                <div className="footer-links" style={{ maxWidth: '100%' }}>
+                    <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                        © 2026 TeslaVINReport
+                    </span>
+                    <span className="footer-sep" style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
+                    <a href="/Blog.txt" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'} onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}>Blog</a>
+                    <span className="footer-sep" style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
+                    <a href="/PrivacyPolicy.txt" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'} onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}>Privacy</a>
+                    <span className="footer-sep" style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
+                    <a href="/llms.txt" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'} onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}>For LLMs</a>
+                    <span className="footer-sep" style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '12px' }}>•</span>
+                    <a href="https://forms.gle/Mi6MqMfDqWFvbz4AA" target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.8)'} onMouseLeave={(e) => e.target.style.color = 'rgba(255, 255, 255, 0.6)'}>Feature Request</a>
+                </div>
+                <a
                     href="https://www.repairwise.pro/blog/how-to-maximize-the-lifespan-of-your-tesla-model-3-tires"
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                        fontSize: '10px',
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        textDecoration: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                    }}
+                    style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.6)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
                     <span>CC</span>
                     <span>Image via RepairWise</span>
